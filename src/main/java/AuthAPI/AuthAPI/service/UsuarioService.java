@@ -5,7 +5,6 @@ import AuthAPI.AuthAPI.dtos.UsuarioResponseDTO;
 import AuthAPI.AuthAPI.dtos.requests.UsuarioRequestDTO;
 import AuthAPI.AuthAPI.model.Usuario;
 import AuthAPI.AuthAPI.repository.UsuarioRepository;
-import org.springframework.boot.tomcat.autoconfigure.TomcatServerProperties;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
