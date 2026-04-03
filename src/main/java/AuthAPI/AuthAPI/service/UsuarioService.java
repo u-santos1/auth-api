@@ -27,7 +27,7 @@ public class UsuarioService {
         Usuario salvo = salvarUsuarioNoBanco(data, PerfilAcesso.USER);
         return new UsuarioResponseDTO(salvo);
     }
-    public Usuario salvarUsuarioNoBanco(UsuarioRequestDTO data, PerfilAcesso perfil){
+    private Usuario salvarUsuarioNoBanco(UsuarioRequestDTO data, PerfilAcesso perfil){
         if (usuarioRepository.existsByEmail(data.email())){
             throw new RuntimeException("email ja em uso");
         }
