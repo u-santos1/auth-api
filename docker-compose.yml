@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  postgres-db:
+    image: postgres:15
+    container_name: auth-api-postgres
+    ports:
+      - "5432:5432" # Mapeia a porta 5432 do seu PC para a 5432 do Docker
+    environment:
+      - POSTGRES_DB=auth_api_db
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=senha_secreta
+    restart: unless-stopped

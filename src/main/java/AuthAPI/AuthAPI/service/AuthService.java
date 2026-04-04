@@ -4,6 +4,7 @@ import AuthAPI.AuthAPI.dtos.requests.LoginDTO;
 import AuthAPI.AuthAPI.infra.segurity.TokenService;
 import AuthAPI.AuthAPI.model.Usuario;
 import AuthAPI.AuthAPI.repository.UsuarioRepository;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -19,7 +20,7 @@ public class AuthService implements UserDetailsService {
     private final TokenService tokenService;
     private final UsuarioRepository usuarioRepository;
 
-    public AuthService(AuthenticationManager authenticationManager, TokenService tokenService, UsuarioRepository usuarioRepository){
+    public AuthService(@Lazy AuthenticationManager authenticationManager, TokenService tokenService, UsuarioRepository usuarioRepository){
         this.authenticationManager = authenticationManager;
         this.tokenService = tokenService;
         this.usuarioRepository = usuarioRepository;

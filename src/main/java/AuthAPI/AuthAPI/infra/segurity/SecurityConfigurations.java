@@ -34,9 +34,12 @@ public class SecurityConfigurations {
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(req-> {
                     req.requestMatchers(HttpMethod.POST, "/auth/login").permitAll();
-                    req.requestMatchers(HttpMethod.POST, "/api/usuario/register").permitAll();
-                    req.requestMatchers(HttpMethod.POST, "/api/usuario/registrar/admin").hasAllAuthorities("ADMIN");
-                    req.anyRequest();
+                    // CORREÇÃO 1: Mudamos de "register" para "registrar"
+                    req.requestMatchers(HttpMethod.POST, "/api/usuario/registrar").permitAll();
+                    // CORREÇÃO 2: Mudamos para hasRole para bater com o ROLE_ADMIN da sua entidade
+                    req.requestMatchers(HttpMethod.POST, "/api/usuario/registrar/admin").hasRole("ADMIN");
+
+                    req.anyRequest().authenticated();
                 })
                 .addFilterBefore(securityFilter,UsernamePasswordAuthenticationFilter.class)
                 .build();
