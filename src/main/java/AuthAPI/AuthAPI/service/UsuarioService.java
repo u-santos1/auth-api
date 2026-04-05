@@ -3,6 +3,7 @@ package AuthAPI.AuthAPI.service;
 import AuthAPI.AuthAPI.PerfilAcesso;
 import AuthAPI.AuthAPI.dtos.UsuarioResponseDTO;
 import AuthAPI.AuthAPI.dtos.requests.UsuarioRequestDTO;
+import AuthAPI.AuthAPI.infra.segurity.RegraDeNegocioException;
 import AuthAPI.AuthAPI.model.Usuario;
 import AuthAPI.AuthAPI.repository.UsuarioRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -29,7 +30,7 @@ public class UsuarioService {
     }
     private Usuario salvarUsuarioNoBanco(UsuarioRequestDTO data, PerfilAcesso perfil){
         if (usuarioRepository.existsByEmail(data.email())){
-            throw new RuntimeException("email ja em uso");
+            throw new RegraDeNegocioException("email ja em uso");
         }
         Usuario usuario = new Usuario();
         usuario.setNome(data.nome().trim());

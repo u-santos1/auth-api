@@ -10,6 +10,6 @@ public class TokenException extends RuntimeException {
     }
 
     public TokenException(String message, Throwable throwable){
-        super(message);
+        super(message, throwable);
     }
 }

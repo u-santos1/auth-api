@@ -42,7 +42,6 @@ public class Usuario implements UserDetails {
     private LocalDateTime createdAt;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
     private PerfilAcesso perfil;
 
 
