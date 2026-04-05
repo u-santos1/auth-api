@@ -41,11 +41,12 @@ public class SecurityFilter extends OncePerRequestFilter {
         }}catch (Exception e){
            SecurityContextHolder.clearContext();
        }
+       filterChain.doFilter(request, response);
     }
     private String recuperarToken(HttpServletRequest request){
         var authorizationHeader = request.getHeader("Authorization");
 
-        if (authorizationHeader.toLowerCase().startsWith("bearer ")) {
+        if (authorizationHeader != null && authorizationHeader.toLowerCase().startsWith("bearer ")) {
             return authorizationHeader.substring(7).trim();
 
         }
