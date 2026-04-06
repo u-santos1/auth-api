@@ -38,6 +38,7 @@ public class SecurityConfigurations {
                     req.requestMatchers(HttpMethod.POST, "/api/usuario/registrar").permitAll();
                     // CORREÇÃO 2: Mudamos para hasRole para bater com o ROLE_ADMIN da sua entidade
                     req.requestMatchers(HttpMethod.POST, "/api/usuario/registrar/admin").hasRole("ADMIN");
+                    req.requestMatchers(HttpMethod.GET, "/api/usuario/admin/listar").hasRole("ADMIN");
 
                     req.anyRequest().authenticated();
                 })

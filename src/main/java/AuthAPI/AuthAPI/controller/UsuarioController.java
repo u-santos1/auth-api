@@ -10,6 +10,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/usuario")
 public class UsuarioController {
@@ -38,5 +40,10 @@ public class UsuarioController {
     @GetMapping("/me")
     public ResponseEntity<UsuarioResponseDTO> detalharPerfil(@AuthenticationPrincipal Usuario usuarioLogado){
         return ResponseEntity.ok(new UsuarioResponseDTO(usuarioLogado));
+    }
+
+    @GetMapping("/admin/listar")
+    public ResponseEntity<List<UsuarioResponseDTO>> listarTodos(){
+        return ResponseEntity.ok(usuarioService.listarTodos());
     }
 }

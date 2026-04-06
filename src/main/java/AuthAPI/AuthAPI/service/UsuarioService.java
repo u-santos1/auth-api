@@ -9,6 +9,7 @@ import AuthAPI.AuthAPI.repository.UsuarioRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -41,5 +42,9 @@ public class UsuarioService {
         usuario.setAtivo(true);
 
         return usuarioRepository.save(usuario);
+    }
+    public List<UsuarioResponseDTO> listarTodos(){
+        return usuarioRepository.findAll().stream().filter(usuario -> usuario.getEmail().contains("@gmail.com")).map(UsuarioResponseDTO::new)
+                .toList();
     }
 }
