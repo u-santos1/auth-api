@@ -17,6 +17,10 @@ public class RegistroRateLimitService {
             .expireAfterAccess(Duration.ofMinutes(1))
             .build();
 
+    public void resetCache() {
+        cacheRegistro.invalidateAll();
+    }
+
     public void verificarLimiteDeRegistro(String ip){
         Bucket bucket = cacheRegistro.get(ip, k-> criarBaldeDeRegistro());
         if(!bucket.tryConsume(1)){

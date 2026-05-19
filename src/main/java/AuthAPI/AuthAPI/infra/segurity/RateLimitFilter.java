@@ -25,6 +25,12 @@ public class RateLimitFilter extends OncePerRequestFilter {
             .maximumSize(10000)
             .expireAfterAccess(Duration.ofMinutes(10))
             .build();
+
+
+    public void resetCache() {
+        cache.invalidateAll();
+    }
+
     private Bucket criarNovoBalde(){
         Bandwidth limit = Bandwidth.builder()
                 .capacity(10)

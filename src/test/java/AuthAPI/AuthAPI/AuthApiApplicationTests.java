@@ -1,8 +1,13 @@
 package AuthAPI.AuthAPI;
 
 
+import AuthAPI.AuthAPI.infra.segurity.RateLimitFilter;
+import AuthAPI.AuthAPI.infra.segurity.RegistroRateLimitService;
 import AuthAPI.AuthAPI.model.Usuario;
+import AuthAPI.AuthAPI.repository.UsuarioRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.checkerframework.checker.units.qual.A;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -10,8 +15,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
 
@@ -33,13 +40,34 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @DisplayName("Suite de Segurança — AuthAPI")
+
 class AuthApiSecurityTests {
 
 	@Autowired
 	private MockMvc mockMvc;
 
 	@Autowired
+	UsuarioRepository usuarioRepository;
+
+	@Autowired
 	private ObjectMapper objectMapper;
+
+	@Autowired
+	private RateLimitFilter rateLimitFilter;
+
+	@Autowired
+	private RegistroRateLimitService registroRateLimitService;
+
+	@Autowired
+	private PasswordEncoder passwordEncoder;
+
+
+	@BeforeEach
+	void resetRateLimit() {
+		rateLimitFilter.resetCache();
+		registroRateLimitService.resetCache();
+		usuarioRepository.deleteAll();
+	}
 
 	// =========================================================================
 	// 1. CONTROLE DE ACESSO — endpoints protegidos vs públicos
@@ -332,7 +360,16 @@ class AuthApiSecurityTests {
 		@WithMockUser(roles = "USER")
 		@DisplayName("Endpoint /me não deve retornar campo senha no JSON")
 		void perfilMe_naoRetornaSenha() throws Exception {
-			mockMvc.perform(get("/api/usuario/me"))
+			Usuario usuario = new Usuario();
+			usuario.setNome("Wesley");
+			usuario.setEmail("wesley@test.com");
+			usuario.setSenha(passwordEncoder.encode("Senha123"));
+			usuario.setPerfil(PerfilAcesso.USER);
+			usuario.setAtivo(true);
+			usuarioRepository.save(usuario);
+
+			mockMvc.perform(get("/api/usuario/me")
+							.with(user(usuario))) // injeta o usuario real
 					.andExpect(status().isOk())
 					.andExpect(jsonPath("$.senha").doesNotExist())
 					.andExpect(jsonPath("$.password").doesNotExist());
