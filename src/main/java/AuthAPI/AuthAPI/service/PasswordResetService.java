@@ -28,28 +28,25 @@ public class PasswordResetService {
 
     @Transactional
     public void solicitarResetDeSenha(String email, String ip) {
+        securityLogger.logSolicitacaoRecuperacaoSenha(email,ip);
         Optional<Usuario> usuarioOpt = usuarioRepository.findByEmail(email);
 
 
-        if (usuarioOpt.isPresent()) {
-            Usuario usuario = usuarioOpt.get();
-
-            String token = UUID.randomUUID().toString();
-            securityLogger.logSolicitacaoRecuperacaoSenha(email, ip);
-
-            LocalDateTime expiracao = LocalDateTime.now().plusMinutes(15);
-
-            PasswordResetToken resetToken = new PasswordResetToken(token, usuario, expiracao);
-
-            tokenRepository.save(resetToken);
-
-            // TODO: Aqui entraria o envio real de e-mail (ex: JavaMailSender)
-            // Como estamos em lab local, vamos simular imprimindo no console:
-            System.out.println("\n========================================================");
-            System.out.println(" SIMULAÇÃO DE E-MAIL ENVIADO PARA: " + email);
-            System.out.println(" Link de recuperação: http://localhost:8080/auth/reset-senha?token=" + token);
-            System.out.println("========================================================\n");
+        if (usuarioOpt.isEmpty()){
+            return;
         }
+        Usuario usuario = usuarioOpt.get();
+        String token = UUID.randomUUID().toString();
+        LocalDateTime expiracao = LocalDateTime.now().plusMinutes(15);
+        PasswordResetToken resetToken = new PasswordResetToken(token, usuario, expiracao);
+        tokenRepository.save(resetToken);
+
+        // Como estamos em lab local, vamos simular imprimindo no console:
+        System.out.println("\n========================================================");
+        System.out.println(" SIMULAÇÃO DE E-MAIL ENVIADO PARA: " + email);
+        System.out.println(" Link de recuperação: http://localhost:8080/auth/reset-senha?token=" + token);
+        System.out.println("========================================================\n");
+
     }
 
     @Transactional

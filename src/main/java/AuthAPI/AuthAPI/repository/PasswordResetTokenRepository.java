@@ -17,7 +17,7 @@ public interface PasswordResetTokenRepository extends JpaRepository<PasswordRese
     @Modifying
     @Transactional
     @Query(
-            "DELETE FROM PasswordResetToken t WHERE t.dataExpiracao < :agora"
+            "DELETE FROM PasswordResetToken t WHERE t.dateExpiracao < :agora"
     )
     void deletarTokenExpirados(LocalDateTime agora);
 }

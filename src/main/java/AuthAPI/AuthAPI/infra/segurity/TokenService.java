@@ -21,6 +21,12 @@ public class TokenService {
     @Value("${api.security.token.secret}")
     private String secret;
 
+    public void validarSecret(){
+        if (secret == null || secret.isBlank() || secret.length() < 32){
+            throw new IllegalStateException("FATAL: JWT_SECRET ausente ou muito curto. Mínimo de 32 caracteres exigido para segurança criptográfica.");
+        }
+    }
+
     public String gerarToken(Usuario usuario){
         try {
             var algoritmo = Algorithm.HMAC256(secret);

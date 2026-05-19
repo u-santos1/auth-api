@@ -23,7 +23,7 @@ public class RateLimitFilter extends OncePerRequestFilter {
 
     private final Cache<String, Bucket> cache = Caffeine.newBuilder()
             .maximumSize(10000)
-            .expireAfterAccess(Duration.ofMillis(1))
+            .expireAfterAccess(Duration.ofMillis(10))
             .build();
     private Bucket criarNovoBalde(){
         Bandwidth limit = Bandwidth.builder()
@@ -39,7 +39,7 @@ public class RateLimitFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain)throws ServletException, IOException {
-        String ip = extrairIpReal(request);
+        String ip = HttpUtils.getClientIp(request);
         Bucket bucket = cache.get(ip, k-> criarNovoBalde());
         if (bucket.tryConsume(1)){
             filterChain.doFilter(request,response);
@@ -48,11 +48,5 @@ public class RateLimitFilter extends OncePerRequestFilter {
             response.getWriter().write("Muitas requisicoes. Tente novamente em 1 minuto");
         }
     }
-    private String extrairIpReal(HttpServletRequest request){
-        String ip = request.getHeader("X-Forwarded-For");
-        if(ip == null || ip.isBlank()){
-            return request.getRemoteAddr();
-        }
-        return ip.split(",")[0].trim();
-    }
+
 }

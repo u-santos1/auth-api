@@ -1,6 +1,7 @@
 package AuthAPI.AuthAPI.controller;
 import AuthAPI.AuthAPI.dtos.TokenJwtDTO;
 import AuthAPI.AuthAPI.dtos.requests.LoginDTO;
+import AuthAPI.AuthAPI.dtos.requests.ResetSenhaDTO;
 import AuthAPI.AuthAPI.infra.segurity.HttpUtils;
 import AuthAPI.AuthAPI.infra.segurity.SecurityLogger;
 import AuthAPI.AuthAPI.infra.segurity.TokenService;
@@ -61,9 +62,9 @@ public class AuthController {
     }
 
     @PostMapping("/reset-senha")
-    public ResponseEntity<String> redefinirSenha(@RequestParam String token, @RequestBody @Valid LoginDTO requestDTO, HttpServletRequest request) {
+    public ResponseEntity<String> redefinirSenha(@RequestParam String token, @RequestBody @Valid ResetSenhaDTO requestDTO, HttpServletRequest request) {
         String ip = HttpUtils.getClientIp(request);
-        passwordResetService.redefinirSenha(token, requestDTO.senha(), ip);
+        passwordResetService.redefinirSenha(token, requestDTO.token(), ip);
         return ResponseEntity.ok("Senha alterada com sucesso.");
     }
 }

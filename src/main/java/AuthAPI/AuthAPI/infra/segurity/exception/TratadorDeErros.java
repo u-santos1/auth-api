@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -40,6 +41,12 @@ public class TratadorDeErros {
         log.warn("Erro Interno inesperado", exception);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new DadosErroSimples("Erro Interno"));
     }
+    @ExceptionHandler(org.springframework.security.core.userdetails.UsernameNotFoundException.class)
+    public ResponseEntity tratarUsuarioNaoEncontrado(org.springframework.security.core.userdetails.UsernameNotFoundException ex){
+        log.warn("Tentativa de acesso com usuario inexistente: {} ", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(new DadosErroSimples("Email ou senha incorretos"));
+    }
     private record DadosErroValidacao(String campo, String mensagem){
         public DadosErroValidacao(FieldError error){
             this(error.getField(), error.getDefaultMessage());
@@ -47,4 +54,5 @@ public class TratadorDeErros {
     }
     private record DadosErroSimples(String mensagem){
     }
+
 }

@@ -3,6 +3,7 @@ package AuthAPI.AuthAPI.controller;
 import AuthAPI.AuthAPI.dtos.UsuarioResponseDTO;
 import AuthAPI.AuthAPI.dtos.requests.UsuarioRequestDTO;
 
+import AuthAPI.AuthAPI.infra.segurity.HttpUtils;
 import AuthAPI.AuthAPI.infra.segurity.RegistroRateLimitService;
 import AuthAPI.AuthAPI.infra.segurity.SecurityLogger;
 import AuthAPI.AuthAPI.model.Usuario;
@@ -44,8 +45,7 @@ public class UsuarioController {
     public ResponseEntity<UsuarioResponseDTO> criarUser(@Valid @RequestBody UsuarioRequestDTO data,
                                                         UriComponentsBuilder uriComponentsBuilder,
                                                         HttpServletRequest request){
-        String ip = extrairIpReal(request);
-
+        String ip = HttpUtils.getClientIp(request);
         rateLimitService.verificarLimiteDeRegistro(ip);
 
         UsuarioResponseDTO dto = usuarioService.criarUser(data);
@@ -54,13 +54,7 @@ public class UsuarioController {
 
         return ResponseEntity.created(uri).body(dto);
     }
-    private String extrairIpReal(HttpServletRequest request){
-        String ip = request.getHeader("X-Forwarded-For");
-        if(ip == null || ip.isBlank()){
-            return request.getRemoteAddr();
-        }
-        return ip.split(",")[0].trim();
-    }
+
     @GetMapping("/me")
     public ResponseEntity<UsuarioResponseDTO> detalharPerfil(@AuthenticationPrincipal Usuario usuarioLogado){
         return ResponseEntity.ok(new UsuarioResponseDTO(usuarioLogado));
