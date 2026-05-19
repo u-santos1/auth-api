@@ -62,9 +62,9 @@ public class AuthController {
     }
 
     @PostMapping("/reset-senha")
-    public ResponseEntity<String> redefinirSenha(@RequestParam String token, @RequestBody @Valid ResetSenhaDTO requestDTO, HttpServletRequest request) {
+    public ResponseEntity<String> redefinirSenha(@RequestBody @Valid ResetSenhaDTO requestDTO, HttpServletRequest request) {
         String ip = HttpUtils.getClientIp(request);
-        passwordResetService.redefinirSenha(token, requestDTO.token(), ip);
+        passwordResetService.redefinirSenha(requestDTO.token(),requestDTO.novaSenha(), ip);
         return ResponseEntity.ok("Senha alterada com sucesso.");
     }
 }
