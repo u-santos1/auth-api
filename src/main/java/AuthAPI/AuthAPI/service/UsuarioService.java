@@ -33,7 +33,12 @@ public class UsuarioService {
     }
     private Usuario salvarUsuarioNoBanco(UsuarioRequestDTO data, PerfilAcesso perfil){
         if (usuarioRepository.existsByEmail(data.email())){
-            throw new RegraDeNegocioException("Se os dados estiverem corretos, um e-mail de confirmação foi enviado");
+            passwordEncoder.encode(data.senha());
+            Usuario fakeUser = new Usuario();
+            fakeUser.setId(0L);
+            fakeUser.setEmail(data.email());
+            fakeUser.setNome(data.nome());
+            return fakeUser;
         }
         Usuario usuario = new Usuario();
         usuario.setNome(data.nome().trim());

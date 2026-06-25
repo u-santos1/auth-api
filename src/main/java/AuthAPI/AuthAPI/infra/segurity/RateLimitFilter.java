@@ -27,14 +27,15 @@ public class RateLimitFilter extends OncePerRequestFilter {
             .build();
 
 
-    public void resetCache() {
+
+    private void resetCache() {
         cache.invalidateAll();
     }
 
     private Bucket criarNovoBalde(){
         Bandwidth limit = Bandwidth.builder()
-                .capacity(10)
-                .refillGreedy(10, Duration.ofMinutes(1))
+                .capacity(150)
+                .refillGreedy(150, Duration.ofMinutes(1))
                 .build();
 
         return Bucket.builder()

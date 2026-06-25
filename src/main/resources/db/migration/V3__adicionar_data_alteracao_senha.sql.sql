@@ -1,0 +1,1 @@
+ALTER TABLE tb_usuarios ADD COLUMN data_ultima_alteracao_senha TIMESTAMP DEFAULT NOW();

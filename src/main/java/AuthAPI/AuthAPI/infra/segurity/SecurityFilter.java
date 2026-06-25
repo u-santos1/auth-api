@@ -34,11 +34,15 @@ public class SecurityFilter extends OncePerRequestFilter {
         var tokenJWT = recuperarToken(request);
         if (tokenJWT != null){
             var subject = tokenService.getSubject(tokenJWT);
+            var issuedAt = tokenService.getIssuedAt(tokenJWT);
 
             var usuario = usuarioRepository.findByEmail(subject)
                     .orElseThrow(()-> new UsernameNotFoundException("Usuario nao encontrado"));
             if (!usuario.isEnabled() || !usuario.isAccountNonLocked()) {
                 throw new TokenException("Usuario desativado ou bloqueado");
+            }
+            if (usuario.getDataUltimaAlteracaoSenha() != null && issuedAt.isBefore(usuario.getDataUltimaAlteracaoSenha())){
+                throw new TokenException("Token revogado: a senha foi alterada recentemente.");
             }
             var authentication = new UsernamePasswordAuthenticationToken(usuario,null, usuario.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(authentication);

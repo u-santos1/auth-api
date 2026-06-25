@@ -11,6 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
@@ -24,6 +25,21 @@ public class PasswordResetService {
     private final PasswordEncoder passwordEncoder;
     private final SecurityLogger securityLogger;
 
+    private String hashToken(String token){
+        try {
+            java.security.MessageDigest digest = java.security.MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(token.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+            StringBuilder hexString = new StringBuilder();
+            for (byte b: hash){
+                String hex = Integer.toHexString(0xff & b);
+                if (hex.length() == 1) hexString.append('0');
+                hexString.append(hex);
+            } return hexString.toString();
+        }catch (Exception e){
+            throw new RuntimeException("Erro ao processar token criptográfico", e);
+        }
+    }
+
 
 
     @Transactional
@@ -36,22 +52,25 @@ public class PasswordResetService {
             return;
         }
         Usuario usuario = usuarioOpt.get();
-        String token = UUID.randomUUID().toString();
+        String tokenPlano = UUID.randomUUID().toString();
+        String tokenHash = hashToken(tokenPlano);
+
         LocalDateTime expiracao = LocalDateTime.now().plusMinutes(15);
-        PasswordResetToken resetToken = new PasswordResetToken(token, usuario, expiracao);
+        PasswordResetToken resetToken = new PasswordResetToken(tokenHash, usuario, expiracao);
         tokenRepository.save(resetToken);
 
         // Como estamos em lab local, vamos simular imprimindo no console:
         System.out.println("\n========================================================");
         System.out.println(" SIMULAÇÃO DE E-MAIL ENVIADO PARA: " + email);
-        System.out.println(" Link de recuperação: http://localhost:8080/auth/reset-senha?token=" + token);
+        System.out.println(" Link de recuperação: http://localhost:8080/auth/reset-senha?token=" + tokenHash);
         System.out.println("========================================================\n");
 
     }
 
     @Transactional
-    public void redefinirSenha(String token, String novaSenha, String ip) {
-        PasswordResetToken resetToken = tokenRepository.findByToken(token)
+    public void redefinirSenha(String tokenPlano, String novaSenha, String ip) {
+        String tokenHash = hashToken(tokenPlano);
+        PasswordResetToken resetToken = tokenRepository.findByToken(tokenHash)
                 .orElseThrow(() -> new RegraDeNegocioException("Token inválido ou não encontrado."));
 
         if (resetToken.isExpirado()) {
@@ -62,6 +81,8 @@ public class PasswordResetService {
 
         Usuario usuario = resetToken.getUsuario();
         usuario.setSenha(passwordEncoder.encode(novaSenha));
+
+        usuario.setDataUltimaAlteracaoSenha(Instant.now());
         usuarioRepository.save(usuario);
         securityLogger.logSenhaAlteradaComSucesso(usuario.getEmail(), ip);
 

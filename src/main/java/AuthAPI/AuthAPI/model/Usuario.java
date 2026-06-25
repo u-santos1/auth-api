@@ -10,6 +10,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
@@ -35,6 +36,8 @@ public class Usuario implements UserDetails {
 
     @Column(nullable = false)
     private Boolean ativo = true;
+    @Column(name = "data_ultima_alteracao_senha")
+    private Instant dataUltimaAlteracaoSenha = Instant.now();
 
     @CreationTimestamp
     private LocalDateTime createdAt;

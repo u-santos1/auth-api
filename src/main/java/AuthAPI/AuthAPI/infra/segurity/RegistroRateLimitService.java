@@ -14,10 +14,10 @@ import java.time.Duration;
 public class RegistroRateLimitService {
     private final Cache<String, Bucket> cacheRegistro = Caffeine.newBuilder()
             .maximumSize(5000)
-            .expireAfterAccess(Duration.ofMinutes(1))
+            .expireAfterAccess(Duration.ofHours(1))
             .build();
 
-    public void resetCache() {
+    private void resetCache() {
         cacheRegistro.invalidateAll();
     }
 
